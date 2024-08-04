@@ -1,0 +1,163 @@
+import 'package:flutter/material.dart';
+import '../../shared/cubit/charity_cubit.dart';
+import 'campaign/campaigns_page.dart';
+import 'previous_donations/previous_donations_page.dart';
+import 'request/request_page.dart';
+
+class DonationScreen extends StatefulWidget {
+  @override
+  _DonationScreenState createState() => _DonationScreenState();
+}
+
+class _DonationScreenState extends State<DonationScreen> {
+  int _selectedIndex = 0;
+
+  final List<Widget> _pages = [
+    CampaignsPage(),
+    RequestsPage(),
+    PreviousDonationsPage(),
+  ];
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+  void _showDonationDialog(BuildContext context) {
+    final TextEditingController amountController = TextEditingController();
+    final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            'Donate to Fund',
+            style: TextStyle(color: Theme.of(context).colorScheme.primary),
+          ),
+          content: Form(
+            key: formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  'Enter the amount you want to donate in Syrian Pounds:',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Theme.of(context).colorScheme.onBackground,
+                  ),
+                ),
+                SizedBox(height: 20),
+                TextFormField(
+                  controller: amountController,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Amount (SYP)',
+                    prefixIcon: Icon(Icons.monetization_on),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter an amount.';
+                    }
+                    final amount = double.tryParse(value);
+                    if (amount == null || amount <= 0) {
+                      return 'Enter a valid amount greater than zero.';
+                    }
+                    return null;
+                  },
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                if (formKey.currentState?.validate() ?? false) {
+                  final amount = amountController.text;
+                  CharityCubit.get(context).donatForFund(context: context, amount: amount);
+                  Navigator.of(context).pop();
+                }
+              },
+              child: Text('Donate'),
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.white,
+                backgroundColor: Theme.of(context).colorScheme.primary,
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      body: SafeArea(
+        child: Column(
+          children: [
+            Container(
+              height: 80, // Adjust height as needed
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.background,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    spreadRadius: 2,
+                    blurRadius: 5,
+                    offset: Offset(0, 2), // changes position of shadow
+                  ),
+                ],
+              ),
+              child: BottomNavigationBar(
+                type: BottomNavigationBarType.fixed,
+                currentIndex: _selectedIndex,
+                onTap: _onItemTapped,
+                selectedItemColor: Theme.of(context).colorScheme.primary,
+                unselectedItemColor: Theme.of(context).colorScheme.onBackground,
+                selectedFontSize: 16,
+                unselectedFontSize: 13,
+                items: [
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.campaign),
+                    label: 'Campaigns',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.request_page),
+                    label: 'Requests',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.history),
+                    label: 'Previous Donations',
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: IndexedStack(
+                index: _selectedIndex,
+                children: _pages,
+              ),
+            ),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _showDonationDialog(context),
+        child: Icon(Icons.attach_money),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+      ),
+    );
+  }
+}
