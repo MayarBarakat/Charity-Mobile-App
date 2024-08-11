@@ -1,5 +1,9 @@
+import 'dart:math'; // Import to use Random
+import 'package:charity/shared/components/components.dart';
 import 'package:flutter/material.dart';
 import '../../shared/cubit/charity_cubit.dart';
+import '../../shared/network/local/cache_helper.dart';
+import '../auth_screens/login_screen/login_screen.dart';
 import 'campaign/campaigns_page.dart';
 import 'previous_donations/previous_donations_page.dart';
 import 'request/request_page.dart';
@@ -17,6 +21,8 @@ class _DonationScreenState extends State<DonationScreen> {
     RequestsPage(),
     PreviousDonationsPage(),
   ];
+
+
 
   void _onItemTapped(int index) {
     setState(() {
@@ -51,6 +57,15 @@ class _DonationScreenState extends State<DonationScreen> {
                   ),
                 ),
                 SizedBox(height: 20),
+                Text(
+                  'Your wallet balance: ${CharityCubit.get(context).walletAmount.toStringAsFixed(2)} SYP',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                ),
+                SizedBox(height: 20),
                 TextFormField(
                   controller: amountController,
                   keyboardType: TextInputType.number,
@@ -66,6 +81,9 @@ class _DonationScreenState extends State<DonationScreen> {
                     final amount = double.tryParse(value);
                     if (amount == null || amount <= 0) {
                       return 'Enter a valid amount greater than zero.';
+                    }
+                    if (amount > CharityCubit.get(context).walletAmount) {
+                      return 'Amount exceeds your wallet balance.';
                     }
                     return null;
                   },
@@ -85,7 +103,6 @@ class _DonationScreenState extends State<DonationScreen> {
                 if (formKey.currentState?.validate() ?? false) {
                   final amount = amountController.text;
                   CharityCubit.get(context).donatForFund(context: context, amount: amount);
-                  Navigator.of(context).pop();
                 }
               },
               child: Text('Donate'),
@@ -100,8 +117,51 @@ class _DonationScreenState extends State<DonationScreen> {
     );
   }
 
+  void _showLoginPrompt(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            'Login Required',
+            style: TextStyle(color: Theme.of(context).colorScheme.primary),
+          ),
+          content: Text(
+            'You need to be logged in to make a donation. Please log in to continue.',
+            style: TextStyle(
+              fontSize: 16,
+              color: Theme.of(context).colorScheme.onBackground,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+               navigateAndFinish(context, LoginScreen());
+              },
+              child: Text('Login'),
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.white,
+                backgroundColor: Theme.of(context).colorScheme.primary,
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final token = CacheHelper.getData(key: 'token');
+    final bool isLoggedIn = token != null;
+
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
@@ -154,9 +214,17 @@ class _DonationScreenState extends State<DonationScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => _showDonationDialog(context),
+        onPressed: () {
+          if (isLoggedIn) {
+            _showDonationDialog(context);
+          } else {
+            _showLoginPrompt(context);
+          }
+        },
         child: Icon(Icons.attach_money),
-        backgroundColor: Theme.of(context).colorScheme.primary,
+        backgroundColor: isLoggedIn
+            ? Theme.of(context).colorScheme.primary
+            : Colors.grey, // Grey color if not logged in
       ),
     );
   }

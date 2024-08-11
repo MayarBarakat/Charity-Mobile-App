@@ -1,3 +1,5 @@
+import 'dart:math';
+import 'package:charity/shared/components/components.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../shared/cubit/charity_cubit.dart';
@@ -10,6 +12,8 @@ class CampaignDetailsFromDonationPage extends StatelessWidget {
   final String id;
 
   CampaignDetailsFromDonationPage({required this.title, required this.id});
+
+  // Generate a random wallet amount between 100 and 100,000
 
   @override
   Widget build(BuildContext context) {
@@ -194,6 +198,15 @@ class CampaignDetailsFromDonationPage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
+                  'Your wallet balance: SYP ${CharityCubit.get(context).walletAmount.toStringAsFixed(2)}',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.onBackground,
+                  ),
+                ),
+                SizedBox(height: 10),
+                Text(
                   'Enter the amount you want to donate in Syrian Pounds:',
                   style: TextStyle(
                     fontSize: 16,
@@ -217,6 +230,9 @@ class CampaignDetailsFromDonationPage extends StatelessWidget {
                     if (amount == null || amount <= 0) {
                       return 'Enter a valid amount greater than zero.';
                     }
+                    if (amount > CharityCubit.get(context).walletAmount) {
+                      return 'You do not have enough balance to donate this amount.';
+                    }
                     return null;
                   },
                 ),
@@ -239,7 +255,6 @@ class CampaignDetailsFromDonationPage extends StatelessWidget {
                     id: campaignId,
                     amount: amount,
                   );
-                  Navigator.of(context).pop(); // Close the dialog after donation
                 }
               },
               child: Text('Donate'),
@@ -280,12 +295,7 @@ class CampaignDetailsFromDonationPage extends StatelessWidget {
             ),
             ElevatedButton(
               onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => LoginScreen(),
-                  ),
-                );
+                navigateAndFinish(context, LoginScreen());
               },
               child: Text('Login'),
               style: ElevatedButton.styleFrom(

@@ -1,3 +1,5 @@
+import 'dart:math';
+import 'package:charity/shared/components/components.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../shared/cubit/charity_cubit.dart';
@@ -15,6 +17,9 @@ class RequestDetailsPage extends StatefulWidget {
 }
 
 class _RequestDetailsPageState extends State<RequestDetailsPage> {
+
+
+
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<CharityCubit, CharityState>(
@@ -205,6 +210,15 @@ class _RequestDetailsPageState extends State<RequestDetailsPage> {
                       ),
                     ),
                     SizedBox(height: 20),
+                    Text(
+                      'Your wallet balance: ${CharityCubit.get(context).walletAmount.toStringAsFixed(2)} SYP',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
+                    SizedBox(height: 20),
                     TextFormField(
                       controller: amountController,
                       keyboardType: TextInputType.number,
@@ -220,6 +234,9 @@ class _RequestDetailsPageState extends State<RequestDetailsPage> {
                         final amount = double.tryParse(value);
                         if (amount == null || amount <= 0) {
                           return 'Enter a valid amount greater than zero.';
+                        }
+                        if (amount > CharityCubit.get(context).walletAmount) {
+                          return 'Amount exceeds your wallet balance.';
                         }
                         return null;
                       },
@@ -245,7 +262,6 @@ class _RequestDetailsPageState extends State<RequestDetailsPage> {
                     id: requestId,
                     amount: amount,
                   );
-                  Navigator.of(context).pop(); // Close the dialog after donation
                 }
               },
               child: Text('Donate'),
@@ -266,40 +282,35 @@ class _RequestDetailsPageState extends State<RequestDetailsPage> {
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(
-            'Login Required',
-            style: TextStyle(color: Theme.of(context).colorScheme.primary),
-          ),
-          content: Text(
-            'You need to be logged in to make a donation. Please log in to continue.',
-            style: TextStyle(
-              fontSize: 16,
-              color: Theme.of(context).colorScheme.onBackground,
+            title: Text(
+              'Login Required',
+              style: TextStyle(color: Theme.of(context).colorScheme.primary),
             ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => LoginScreen(),
-                  ),
-                );
-              },
-              child: Text('Login'),
-              style: ElevatedButton.styleFrom(
-                foregroundColor: Colors.white,
-                backgroundColor: Theme.of(context).colorScheme.primary,
+            content: Text(
+              'You need to be logged in to make a donation. Please log in to continue.',
+              style: TextStyle(
+                fontSize: 16,
+                color: Theme.of(context).colorScheme.onBackground,
               ),
             ),
-          ],
+            actions: [
+            TextButton(
+            onPressed: () {
+          Navigator.of(context).pop();
+        },
+        child: Text('Cancel'),
+        ),
+        ElevatedButton(
+        onPressed: () {
+        navigateAndFinish(context, LoginScreen());
+        },
+        child: Text('Login'),
+        style: ElevatedButton.styleFrom(
+        foregroundColor: Colors.white,
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        ),
+        ),
+        ],
         );
       },
     );

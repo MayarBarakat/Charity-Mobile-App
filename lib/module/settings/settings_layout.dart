@@ -120,11 +120,11 @@ class SettingsPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                cubit.userModel.first.name??'No Name', // Replace with dynamic user name
+                CacheHelper.getData(key: 'token')!= null? cubit.userModel.first.name! : 'No Name' ,
                 style: TextStyle(fontSize: 22, color: Colors.white, fontWeight: FontWeight.bold),
               ),
               Text(
-                cubit.userModel.first.email??'No Email', // Replace with dynamic email
+                CacheHelper.getData(key: 'token')!= null? cubit.userModel.first.email! :'No Email',
                 style: TextStyle(fontSize: 16, color: Colors.white70),
               ),
             ],

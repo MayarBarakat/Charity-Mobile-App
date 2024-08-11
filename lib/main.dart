@@ -36,7 +36,7 @@ class MyApp extends StatelessWidget {
           create: (BuildContext context) =>
            !isHasToken?CharityCubit():CharityCubit()..getCampaigns(start: '1', count: '10')
              ..getAds(start: '1', count: '10')..getRequests( start: '1', count: '10')
-          ..getPreviousDonationCampaignsModel()..getPreviousDonationRequestsModel()..getUserData(),
+             ..getPreviousDonationCampaignsModel()..getPreviousDonationRequestsModel()..getUserData(),
         ),
       ],
       child: BlocConsumer<CharityCubit, CharityState>(

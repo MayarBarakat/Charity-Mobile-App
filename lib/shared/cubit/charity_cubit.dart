@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:charity/layout/charity_layout.dart';
 import 'package:charity/models/ads_model/ads_model.dart';
@@ -44,6 +46,7 @@ class CharityCubit extends Cubit<CharityState> {
     DonationScreen(),
     SettingsPage(),
   ];
+   int walletAmount = (100 + Random().nextInt(100000 - 100).toInt()) as int;
 
   void changeBottom(int index) {
     currentIndex = index;
@@ -71,7 +74,7 @@ class CharityCubit extends Cubit<CharityState> {
 
       if (response.statusCode == 200) {
         // Assuming a successful response contains the result "Success"
-        emit(CharityLoginSuccessfullyState());
+
         showAwesomeSnackbar(context: context,
             message: 'Login Successfully',
             contentType: ContentType.success);
@@ -79,7 +82,10 @@ class CharityCubit extends Cubit<CharityState> {
         await CacheHelper.saveData(key: 'token', value: token);
         await getUserData();
         await refresh();
+        currentIndex = 0;
+        emit(CharityLoginSuccessfullyState());
         navigateAndFinish(context, const CharityLayout());
+
       } else {
         // If the status code is not 200, show an error toast with the server's message
         showAwesomeSnackbar(context: context,
@@ -121,6 +127,8 @@ class CharityCubit extends Cubit<CharityState> {
 
       loadingSendEmailInResetPassword = false;
       if(response.statusCode == 200){
+        refresh();
+        currentIndex = 0;
         emit(CharitySendEmailInPasswordSuccessfullyState());
         showAwesomeSnackbar(context: context,
             message: 'Email send Successfully',
@@ -170,12 +178,15 @@ class CharityCubit extends Cubit<CharityState> {
       String result = response.data;
       loadingResetConfirmation = false;
       if(response.statusCode == 200 && result != 'rong code'){
-        emit(CharityResetConfirmationSuccessfullyState());
+
         showAwesomeSnackbar(context: context,
             message: 'Password reset successfully',
             contentType: ContentType.success);
         token = result;
+        currentIndex = 0;
+        refresh();
         await CacheHelper.saveData(key: 'token', value: token);
+        emit(CharityResetConfirmationSuccessfullyState());
         navigateAndFinish(context, const CharityLayout());
       }else {
         // If the status code is not 200, show an error toast with the server's message
@@ -292,6 +303,7 @@ bool loadingConfirmCodeAfterSignup = false;
         await CacheHelper.saveData(key: 'token', value: token);
         await getUserData();
         await refresh();
+        currentIndex = 0;
         emit(CharityConfirmCodeSuccessfullyState());
         navigateAndFinish(context, const CharityLayout());
       }else{
@@ -396,6 +408,7 @@ bool loadingConfirmCodeAfterSignup = false;
      getRequests( start: '1', count: '10');
      getPreviousDonationCampaignsModel();
      getPreviousDonationRequestsModel();
+     getUserData();
   }
   bool loadingAddRequest = false;
   Future<void> addRequest({
@@ -500,6 +513,7 @@ bool loadingConfirmCodeAfterSignup = false;
         showAwesomeSnackbar(context: context,
             message: 'Thank you for your donation of $amount SYP!',
             contentType: ContentType.success);
+        walletAmount -= int.parse(amount);
         Navigator.pop(context);
         emit(CharityDonatForFundSuccessfullyState());
       }
@@ -526,6 +540,8 @@ bool loadingConfirmCodeAfterSignup = false;
         showAwesomeSnackbar(context: context,
             message: 'Thank you for your donation of $amount SYP!',
             contentType: ContentType.success);
+        walletAmount -= int.parse(amount);
+        refresh();
         Navigator.pop(context);
         emit(CharityDonatToCampaignSuccessfullyState());
       }
@@ -608,6 +624,8 @@ bool loadingConfirmCodeAfterSignup = false;
         showAwesomeSnackbar(context: context,
             message: 'Thank you for your donation of $amount SYP!',
             contentType: ContentType.success);
+        refresh();
+        walletAmount -= int.parse(amount);
         Navigator.pop(context);
         emit(CharityDonatToRequestSuccessfullyState());
       }
@@ -671,6 +689,7 @@ bool loadingConfirmCodeAfterSignup = false;
         userModel = UserModel.fromJsonList(response.data);
         await CacheHelper.saveData(key: 'id', value: userModel.first.idKey);
         await CacheHelper.saveData(key: 'email', value: userModel.first.email);
+        await CacheHelper.saveData(key: 'name', value: userModel.first.name);
         loadingUserData = false;
         emit(CharityUserDataSuccessfullyState());
       }
@@ -740,6 +759,8 @@ bool loadingConfirmCodeAfterSignup = false;
     CacheHelper.removeData(key: 'token');
     CacheHelper.removeData(key: 'id');
     CacheHelper.removeData(key: 'email');
+    CacheHelper.removeData(key: 'name');
+    userModel.clear();
     currentIndex =0;
     emit(CharityLogoutSuccessfullyState());
     navigateAndFinish(context, LoginScreen());
