@@ -8,7 +8,7 @@ class DioHelper {
   static init() {
     dio = Dio(
       BaseOptions(
-        baseUrl: 'http://192.168.43.15:8000/',
+        baseUrl: 'http://192.168.43.170:8000/',
         receiveDataWhenStatusError: true,
 
       ),
@@ -27,7 +27,7 @@ class DioHelper {
     return await dio!.get(url,
         queryParameters: query,
         options: Options(headers: {
-          'Authorization': "Bearer $token",
+          'Authorization': token,
           'Content-Type': 'application/json',
         })
     );
@@ -45,15 +45,12 @@ class DioHelper {
     //   'Authorization': "Bearer $token",
     //   'Content-Type': 'application/json',
     // };
-    String tokenA ='';
-    if(CacheHelper.getData(key: 'token') != null){
-      tokenA = CacheHelper.getData(key: 'token');
-    }
+
     return dio!.post(url,
         queryParameters: query,
         data: data,
         options: Options(headers: {
-          'Authorization': "Bearer $tokenA",
+          'Authorization': token,
           "Accept" : "application/json"
         }));
   }
@@ -66,7 +63,7 @@ class DioHelper {
     String? token,
   }) async {
     dio!.options.headers = {
-      'Authorization': "Bearer $token",
+      'Authorization': token,
       'Content-Type': 'application/json',
     };
 
@@ -89,7 +86,7 @@ class DioHelper {
         queryParameters: query,
         data: data,
         options: Options(headers: {
-          'Authorization': "Bearer $token",
+          'Authorization': token,
           'Content-Type': 'application/json',
         })
     );

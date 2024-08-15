@@ -6,39 +6,42 @@ class PreviousRequestsScreen extends StatelessWidget {
   const PreviousRequestsScreen({super.key});
 
   String getStatusMessage(int status) {
+    String response = '';
     if ((status % 2) == 1) {
       status -= 1;
-      return 'Visit time set';
+      response+= 'Visit time set, ';
     }
     if (((status / 2) % 2) == 1) {
       status -= 2;
-      return 'Visit completed';
+      response+= 'Visit completed, ';
     }
     if (((status / 4) % 2) == 1) {
       status -= 4;
-      return 'Request presented for donation';
+      response+= 'Request presented for donation, ';
     }
     if (((status / 8) % 2) == 1) {
       status -= 8;
-      return 'Request allocated';
+      response+= 'Request allocated, ';
     }
     if (((status / 16) % 2) == 1) {
       status -= 16;
-      return 'Submitted via reception';
+      response+= 'Submitted via reception, ';
     }
     if (((status / 32) % 2) == 1) {
       status -= 32;
-      return 'Request delivered';
+      response+= 'Request delivered, ';
     }
     if (((status / 64) % 2) == 1) {
       status -= 64;
-      return 'Request rejected by management';
+      response+= 'Request rejected by management, ';
     }
     if (((status / 128) % 2) == 1) {
       status -= 128;
-      return 'Request canceled by user';
+      response+= 'Request canceled by user, ';
+    }if(response == ''){
+      response+= 'Unknown status';
     }
-    return 'Unknown status';
+    return response;
   }
 
   @override

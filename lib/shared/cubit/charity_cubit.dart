@@ -46,7 +46,7 @@ class CharityCubit extends Cubit<CharityState> {
     DonationScreen(),
     SettingsPage(),
   ];
-   int walletAmount = (100 + Random().nextInt(100000 - 100).toInt()) as int;
+   int walletAmount = (100 + Random().nextInt(1000000 - 100000).toInt()) as int;
 
   void changeBottom(int index) {
     currentIndex = index;
@@ -64,7 +64,7 @@ class CharityCubit extends Cubit<CharityState> {
     loadingLogin = true;
     emit(CharityLoginLoadingState());
     try {
-      final response = await DioHelper.postData(url: LOG_IN, data: {
+      final response = await DioHelper.postData(token: token,url: LOG_IN, data: {
         'email': email,
         'password': password,
       });
@@ -120,7 +120,7 @@ class CharityCubit extends Cubit<CharityState> {
     emit(CharitySendEmailInPasswordLoadingState());
 
     try{
-      final response = await DioHelper.postData(url: RESET_PASSWORD, data: {
+      final response = await DioHelper.postData(token: token,url: RESET_PASSWORD, data: {
         'email': email
       });
       String result = response.data;
@@ -170,7 +170,7 @@ class CharityCubit extends Cubit<CharityState> {
     emit(CharityResetConfirmationLoadingState());
     
     try{
-      final response =await DioHelper.postData(url: RESET_CONFIRMATION, data: {
+      final response =await DioHelper.postData(token: token,url: RESET_CONFIRMATION, data: {
         'email':email,
         'code':code,
         'newPassword':newPassword
@@ -187,7 +187,7 @@ class CharityCubit extends Cubit<CharityState> {
         refresh();
         await CacheHelper.saveData(key: 'token', value: token);
         emit(CharityResetConfirmationSuccessfullyState());
-        navigateAndFinish(context, const CharityLayout());
+        navigateAndFinish(context,  LoginScreen());
       }else {
         // If the status code is not 200, show an error toast with the server's message
         showAwesomeSnackbar(context: context,
@@ -229,7 +229,7 @@ class CharityCubit extends Cubit<CharityState> {
     emit(CharitySignupLoadingState());
     
     try{
-      final response = await DioHelper.postData(url: SIGNUP, data: {
+      final response = await DioHelper.postData(token: token,url: SIGNUP, data: {
         'id':nationalNumber,
         'name':name,
         'Email':email,
@@ -289,7 +289,7 @@ bool loadingConfirmCodeAfterSignup = false;
     emit(CharityConfirmCodeLoadingState());
     
     try{
-      final response = await DioHelper.postData(url: CONFIRM_CODE, data: {
+      final response = await DioHelper.postData(token: token,url: CONFIRM_CODE, data: {
         'email':email,
         'code':code
       });
@@ -336,7 +336,7 @@ bool loadingConfirmCodeAfterSignup = false;
     isHasInternet = true;
     emit(CharityCampaignsLoadingState());
     try{
-      final response = await DioHelper.postData(url: CAMPAIGNS, data: {
+      final response = await DioHelper.postData(token: token,url: CAMPAIGNS, data: {
         'start':start,
         'count':count
       });
@@ -366,7 +366,7 @@ bool loadingConfirmCodeAfterSignup = false;
 })async{
     loadingCampDetails = true;
     emit(CharityCampaignsDetailsLoadingState());
-    final response = await DioHelper.postData(url: CAMPAIGN_DETAILS, data: {
+    final response = await DioHelper.postData(token: token,url: CAMPAIGN_DETAILS, data: {
       'id':id
     });
     try{
@@ -388,7 +388,7 @@ bool loadingConfirmCodeAfterSignup = false;
     loadingAds = true;
     emit(CharityAdsLoadingState());
     try{
-      final response = await DioHelper.postData(url: ADS, data: {
+      final response = await DioHelper.postData(token: token,url: ADS, data: {
         'start':start,
         'count':count
       });
@@ -421,7 +421,7 @@ bool loadingConfirmCodeAfterSignup = false;
     emit(CharityAddRequestLoadingState());
 
     try{
-      final response = await DioHelper.postData(url: ADD_REQUEST, data: {
+      final response = await DioHelper.postData(token: token,url: ADD_REQUEST, data: {
         'title':title,
         'work':work,
         'reason':reason,
@@ -455,7 +455,7 @@ bool loadingConfirmCodeAfterSignup = false;
     emit(CharityPreviousRequestLoadingState());
 
     try{
-      final response = await DioHelper.getData(url: PREVIOUS_REQUEST);
+      final response = await DioHelper.getData(token: token,url: PREVIOUS_REQUEST);
       loadingPreviousRequest = false;
       isRequestGet = false;
       previousRequestModel = PreviousRequestsModel.fromJsonList(response.data);
@@ -480,7 +480,7 @@ bool loadingConfirmCodeAfterSignup = false;
     required int idRequest,
   }) async {
     try {
-      final response = await DioHelper.postData(url: REQUEST_CANCEL, data: {
+      final response = await DioHelper.postData(token: token,url: REQUEST_CANCEL, data: {
         'idRequest': idRequest.toString(),
       });
       showAwesomeSnackbar(
@@ -506,7 +506,7 @@ bool loadingConfirmCodeAfterSignup = false;
     required String amount,
 })async{
     try{
-      final response = await DioHelper.postData(url: DONATION_FOR_FUND, data: {
+      final response = await DioHelper.postData(token: token,url: DONATION_FOR_FUND, data: {
         'amount':amount,
       });
       if(response.statusCode == 200){
@@ -532,7 +532,7 @@ bool loadingConfirmCodeAfterSignup = false;
     required String amount,
 })async{
     try{
-      final response = await DioHelper.postData(url: DONATION_TO_CAMPAIGN, data: {
+      final response = await DioHelper.postData(token: token,url: DONATION_TO_CAMPAIGN, data: {
         'id':id,
         'amount':amount
       });
@@ -567,7 +567,7 @@ bool loadingConfirmCodeAfterSignup = false;
     loadingRequests = true;
     emit(CharityGetRequestsLoadingState());
     try{
-      final response = await DioHelper.postData(url: REQUESTS, data: {
+      final response = await DioHelper.postData(token: token,url: REQUESTS, data: {
         'start':start,
         'count':count,
       });
@@ -593,7 +593,7 @@ bool loadingConfirmCodeAfterSignup = false;
     loadingRequestDetails = true;
     emit(CharityRequestDetailsLoadingState());
     try{
-      final response = await DioHelper.postData(url: REQUEST_DETAILS, data: {
+      final response = await DioHelper.postData(token: token,url: REQUEST_DETAILS, data: {
         'id':id
       });
       loadingRequestDetails = false;
@@ -615,7 +615,7 @@ bool loadingConfirmCodeAfterSignup = false;
 
     emit(CharityRequestDetailsLoadingState());
     try{
-      final response = await DioHelper.postData(url: DONATION_TO_REQUEST, data: {
+      final response = await DioHelper.postData(token: token,url: DONATION_TO_REQUEST, data: {
         'id':id,
         'amount':amount
       });
@@ -648,7 +648,7 @@ bool loadingConfirmCodeAfterSignup = false;
     loadingPreviousDonationCampaigns = true;
     emit(CharityPreviousDonationCampaignsLoadingState());
     try{
-      final response = await DioHelper.getData(url: PREVIOUS_DONATION_CAMPAIGNS);
+      final response = await DioHelper.getData(token: token,url: PREVIOUS_DONATION_CAMPAIGNS);
       if(response.statusCode == 200){
         previousDonationCampaignsModel = PreviousDonationCampaignsModel.fromJsonList(response.data);
         loadingPreviousDonationCampaigns = false;
@@ -666,7 +666,7 @@ bool loadingConfirmCodeAfterSignup = false;
     loadingPreviousRequestsCampaigns = true;
     emit(CharityPreviousDonationRequestsLoadingState());
     try{
-      final response = await DioHelper.getData(url: PREVIOUS_DONATION_REQUESTS);
+      final response = await DioHelper.getData(token: token,url: PREVIOUS_DONATION_REQUESTS);
       if(response.statusCode == 200){
         previousDonationRequestsModel = PreviousDonationRequestsModel.fromJsonList(response.data);
         loadingPreviousRequestsCampaigns = false;
@@ -684,7 +684,7 @@ bool loadingConfirmCodeAfterSignup = false;
     loadingUserData = true;
     emit(CharityUserDataLoadingState());
     try{
-      final response = await DioHelper.getData(url:USER_DATA);
+      final response = await DioHelper.getData(token: token,url:USER_DATA);
       if(response.statusCode == 200){
         userModel = UserModel.fromJsonList(response.data);
         await CacheHelper.saveData(key: 'id', value: userModel.first.idKey);
@@ -711,7 +711,7 @@ bool loadingConfirmCodeAfterSignup = false;
     loadingEditProfile = true;
     emit(CharityEditProfileLoadingState());
     try{
-      final response = await DioHelper.postData(url: EDIT_PROFILE, data: {
+      final response = await DioHelper.postData(token: token,url: EDIT_PROFILE, data: {
         'name':name,
         'fullNumber':fullNumber,
         'Date':Date,
@@ -740,7 +740,7 @@ bool loadingConfirmCodeAfterSignup = false;
     loadingAboutUs = true;
     emit(CharityAboutUsLoadingState());
     try{
-      final response = await DioHelper.getData(url: ABOUT_US);
+      final response = await DioHelper.getData(token: token,url: ABOUT_US);
       if(response.statusCode == 200){
         aboutUsModel = AboutUsModel.fromJsonList(response.data);
         loadingAboutUs = false;
@@ -764,5 +764,17 @@ bool loadingConfirmCodeAfterSignup = false;
     currentIndex =0;
     emit(CharityLogoutSuccessfullyState());
     navigateAndFinish(context, LoginScreen());
+  }
+  Future<void> sendComp({required comp})async{
+    try{
+      final response = await DioHelper.postData(token:token,url: 'user/addComplaint', data: {
+        'desc':comp,
+      });
+      print(response.statusCode);
+      emit(CharityLogoutSuccessfullyState());
+    }catch(error){
+      print(error);
+      emit(CharityEditProfileErrorState());
+    }
   }
 }
