@@ -62,7 +62,7 @@ class _CharityLayoutState extends State<CharityLayout> {
                   activeColor: kSecondaryColor,
                   tabBackgroundColor: Colors.white.withOpacity(0.1),
                   gap: 8,
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(12),
                   selectedIndex: cubit.currentIndex,
                   onTabChange: (index) {
                     cubit.changeBottom(index);

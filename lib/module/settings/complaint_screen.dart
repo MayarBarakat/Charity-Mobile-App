@@ -1,5 +1,6 @@
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:charity/shared/components/components.dart';
+import 'package:charity/shared/cubit/charity_cubit.dart';
 import 'package:flutter/material.dart';
 
 class ComplaintScreen extends StatefulWidget {
@@ -32,6 +33,7 @@ class _ComplaintScreenState extends State<ComplaintScreen> {
   void _submitComplaint() {
     if (_formKey.currentState?.validate() ?? false) {
       // Handle submission logic here
+      CharityCubit.get(context).sendComp(comp: _complaintController.text);
       showAwesomeSnackbar(context: context, message: 'The Complaint sent successfully',
           contentType: ContentType.success);
       _nameController.clear();

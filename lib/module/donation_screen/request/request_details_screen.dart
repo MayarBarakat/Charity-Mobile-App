@@ -9,8 +9,9 @@ import '../../../shared/network/local/cache_helper.dart';
 
 class RequestDetailsPage extends StatefulWidget {
   final String title;
+  final String requestId;
 
-  RequestDetailsPage({required this.title});
+  RequestDetailsPage({required this.title,required this.requestId});
 
   @override
   State<RequestDetailsPage> createState() => _RequestDetailsPageState();
@@ -129,7 +130,7 @@ class _RequestDetailsPageState extends State<RequestDetailsPage> {
                       if (token == null) {
                         _showLoginPrompt(context);
                       } else {
-                        _showDonationDialog(context, widget.title);
+                        _showDonationDialog(context, widget.requestId);
                       }
                     },
                     child: Text('Donate to this Request'),

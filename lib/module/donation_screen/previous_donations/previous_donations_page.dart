@@ -4,7 +4,9 @@ import '../../../models/previous_donation_campaigns_model/previous_donation_camp
 import '../../../models/previous_donation_requests_model/previous_donation_request_model.dart';
 import '../../../shared/components/components.dart';
 import '../../../shared/cubit/charity_cubit.dart';
+import '../../../shared/network/local/cache_helper.dart';
 import '../../../shared/styles/theme.dart';
+import '../../auth_screens/login_screen/login_screen.dart';
 
 class PreviousDonationsPage extends StatelessWidget {
   @override
@@ -15,7 +17,74 @@ class PreviousDonationsPage extends StatelessWidget {
       },
       builder: (context, state) {
         var cubit = CharityCubit.get(context);
-
+        final token = CacheHelper.getData(key: 'token');
+        if (token == null) {
+          // If no token, show login prompt
+          return Scaffold(
+            appBar: AppBar(
+              title: Text(
+                'Previous',
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+              ),
+              backgroundColor: Theme.of(context).colorScheme.surface,
+              iconTheme: IconThemeData(color: Theme.of(context).colorScheme.onSurface),
+            ),
+            body: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Icon(
+                      Icons.lock_outline,
+                      size: 80,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      'You need to log in to access this page.',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      'This page allows you to manage your previous Donation Campaigns and requests and view past submissions. Please log in to proceed.',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 30),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => LoginScreen(),
+                          ),
+                        );
+                      },
+                      child: Text('Go to Login'),
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.white, backgroundColor: Theme.of(context).colorScheme.primary,
+                        padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        }
         return Scaffold(
           backgroundColor: kBackgroundColor,
           body: cubit.loadingPreviousDonationCampaigns || cubit.loadingPreviousRequestsCampaigns
@@ -34,7 +103,7 @@ class PreviousDonationsPage extends StatelessWidget {
                     style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: kPrimaryColor),
                   ),
                   const SizedBox(height: 10),
-                  cubit.previousDonationCampaignsModel.isEmpty
+                  cubit.previousDonationCampaignsModel==null
                       ? Center(
                     child: Text(
                       'No previous campaigns available.',
@@ -118,7 +187,7 @@ class CampaignCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Image.asset('assets/images/campaign.jpg', width: double.infinity, height: 120, fit: BoxFit.cover),
+            Image.asset('assets/images/campaign.jpg', width: double.infinity, height: 90, fit: BoxFit.cover),
             const SizedBox(height: 8),
             Text(campaign.title!, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: kPrimaryColor)),
             const SizedBox(height: 4),
@@ -157,7 +226,7 @@ class RequestCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Image.asset('assets/images/request.jpg', width: double.infinity, height: 120, fit: BoxFit.cover),
+            Image.asset('assets/images/request.jpg', width: double.infinity, height: 90, fit: BoxFit.cover),
             const SizedBox(height: 8),
             Text(request.title!, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: kPrimaryColor)),
             const SizedBox(height: 4),

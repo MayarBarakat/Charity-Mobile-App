@@ -63,7 +63,7 @@ class RequestsPage extends StatelessWidget {
     return InkWell(
       onTap: (){
         CharityCubit.get(context).getRequestDetailsModel(context: context, id: id);
-        navigateTo(context, RequestDetailsPage(title: title,));
+        navigateTo(context, RequestDetailsPage(title: title,requestId: id,));
       },
       child: Card(
         elevation: 6,
